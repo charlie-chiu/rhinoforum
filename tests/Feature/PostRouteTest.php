@@ -13,61 +13,71 @@ class PostRouteTest extends TestCase
 {
     use DatabaseMigrations;
 
+    private $apiPath = 'api/posts';
+    private $postCount;
+
     public function setUp(): void
     {
         parent::setUp();
+
         $this->runDatabaseMigrations();
 
-        DB::table('posts')->insert([
-            'user_id' => 999,
-            'content' => 'hello from 999',
-            'category' => 'forum',
-            'published_at' => '2021-11-18'
-        ]);
-
-        DB::table('posts')->insert([
-            'user_id' => 7788,
-            'content' => 'hello, world',
-            'category' => 'forum',
-            'published_at' => '2021-11-18'
-        ]);
-
-        DB::table('posts')->insert([
-            'user_id' => 7788,
-            'content' => 'amazing case',
-            'category' => 'review',
-            'published_at' => '2021-11-18'
-        ]);
+        $this->seedDatabase();
     }
 
-    public function testGetAllPosts_AllPosts()
+    public function seedDatabase(): void
     {
-        $response = $this->json('GET', 'api/posts');
+        $posts = [
+            [
+                'user_id'      => 999,
+                'content'      => 'hello from 999',
+                'category'     => 'review',
+                'published_at' => '2021-11-18'
+            ],
+            [
+                'user_id'      => 7788,
+                'content'      => 'hello, world',
+                'category'     => 'forum',
+                'published_at' => '2021-11-18'
+            ],
+            [
+                'user_id'      => 7788,
+                'content'      => 'amazing case',
+                'category'     => 'review',
+                'published_at' => '2021-11-18'
+            ]
+        ];
 
-        $response->assertStatus(200);
+        $this->postCount = count($posts);
 
-        $response->assertJsonCount(2);
+        foreach ($posts as $post) {
+            DB::table('posts')->insert($post);
+        }
     }
 
-    public function testGetAllPosts_SpecificAuthor()
+    public function testGetAllPosts_AllPosts(): void
     {
-        $response = $this->json('GET', 'api/posts?uid=999');
+        $response = $this->json('GET', $this->apiPath);
 
         $response->assertStatus(200);
+        $response->assertJsonCount($this->postCount);
+    }
 
-        $response->assertJsonCount(1);
+    public function testGetAllPosts_SpecificAuthor(): void
+    {
+        $userID = 999;
+        $response = $this->json('GET', $this->apiPath . '?uid=' . $userID);
 
+        $response->assertStatus(200);
         $response->assertSeeText('hello from 999');
     }
 
-    public function testGetAllPosts_SpecificCategory()
+    public function testGetAllPosts_SpecificCategory(): void
     {
-        $response = $this->json('GET', 'api/posts?category=review');
+        $category = 'review';
+        $response = $this->json('GET', $this->apiPath . '?category=' . $category);
 
         $response->assertStatus(200);
-
-        $response->assertJsonCount(1);
-
         $response->assertSeeText('amazing case');
     }
 }

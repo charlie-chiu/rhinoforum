@@ -17,7 +17,7 @@ class PostController extends Controller
         }
 
         $category = $request->get('category');
-        if (isset($userID)) {
+        if (isset($category)) {
             $condition['category'] = $category;
         }
 
