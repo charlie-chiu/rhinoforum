@@ -16,6 +16,11 @@ class PostController extends Controller
             $condition['user_id'] = $userID;
         }
 
+        $category = $request->get('category');
+        if (isset($userID)) {
+            $condition['category'] = $category;
+        }
+
         $posts = Post::query()->where($condition)->get()->toArray();
 
         return response()->json($posts);

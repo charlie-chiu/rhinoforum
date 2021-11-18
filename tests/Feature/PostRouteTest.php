@@ -31,6 +31,13 @@ class PostRouteTest extends TestCase
             'category' => 'forum',
             'published_at' => '2021-11-18'
         ]);
+
+        DB::table('posts')->insert([
+            'user_id' => 7788,
+            'content' => 'amazing case',
+            'category' => 'review',
+            'published_at' => '2021-11-18'
+        ]);
     }
 
     public function testGetAllPosts_AllPosts()
@@ -51,5 +58,16 @@ class PostRouteTest extends TestCase
         $response->assertJsonCount(1);
 
         $response->assertSeeText('hello from 999');
+    }
+
+    public function testGetAllPosts_SpecificCategory()
+    {
+        $response = $this->json('GET', 'api/posts?category=review');
+
+        $response->assertStatus(200);
+
+        $response->assertJsonCount(1);
+
+        $response->assertSeeText('amazing case');
     }
 }
