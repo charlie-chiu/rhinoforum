@@ -2,40 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\PostRepository;
 use Illuminate\Http\Request;
-use App\Models\Post;
 
 class PostController extends Controller
 {
+    private $postRepository;
+
+    public function __construct(PostRepository $postRepository)
+    {
+        $this->postRepository = $postRepository;
+    }
+
     public function getPosts(Request $request)
     {
-        $condition = [];
-
-        $userID = $request->get('uid');
-        if (isset($userID)) {
-            $condition['user_id'] = $userID;
-        }
-
-        $category = $request->get('category');
-        if (isset($category)) {
-            $condition['category'] = $category;
-        }
-
-        $search = $request->get('search');
-        if (isset($search)) {
-            $condition[] = ['content', 'like' , "%$search%"];
-        }
-
-        $startDate = $request->get('startdate');
-        $endDate = $request->get('enddate');
-
-        $q = Post::query()->where($condition);
-
-        if (isset($startDate, $endDate)) {
-            $q = $q->whereBetween('published_at', [$startDate, $endDate]);
-        }
-
-        $posts = $q->get()->toArray();
+        $posts = $this->postRepository->get(
+            $request->get('uid'),
+            $request->get('category'),
+            $request->get('search'),
+            $request->get('startdate'),
+            $request->get('enddate'),
+        );
 
         return response()->json($posts);
     }
