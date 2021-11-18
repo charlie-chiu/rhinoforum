@@ -9,8 +9,15 @@ class PostController extends Controller
 {
     public function getPosts(Request $request)
     {
-        // TODO: 實作查詢貼文 API
-        $posts = Post::all();
+        $condition = [];
+
+        $userID = $request->get('uid');
+        if (isset($userID)) {
+            $condition['user_id'] = $userID;
+        }
+
+        $posts = Post::query()->where($condition)->get()->toArray();
+
         return response()->json($posts);
     }
 }
