@@ -21,6 +21,11 @@ class PostController extends Controller
             $condition['category'] = $category;
         }
 
+        $search = $request->get('search');
+        if (isset($search)) {
+            $condition[] = ['content', 'like' , "%$search%"];
+        }
+
         $posts = Post::query()->where($condition)->get()->toArray();
 
         return response()->json($posts);

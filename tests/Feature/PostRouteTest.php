@@ -80,4 +80,14 @@ class PostRouteTest extends TestCase
         $response->assertStatus(200);
         $response->assertSeeText('amazing case');
     }
+
+    public function testGetAllPosts_ContainContent(): void
+    {
+        $keyword = 'hello';
+        $response = $this->json('GET', $this->apiPath . '?search=' . $keyword);
+
+        $response->assertJsonCount(2);
+        $response->assertStatus(200);
+        $response->assertSeeText('hello');
+    }
 }
