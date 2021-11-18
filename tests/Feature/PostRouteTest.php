@@ -60,6 +60,12 @@ class PostRouteTest extends TestCase
                 'content'      => $this->DUMMY_CONTENT,
                 'category'     => $this->DUMMY_CATEGORY,
                 'published_at' => '2021-09-18'
+            ],
+            [
+                'user_id'      => 13,
+                'content'      => $this->DUMMY_CONTENT,
+                'category'     => $this->DUMMY_CATEGORY,
+                'published_at' => '2021-09-18'
             ]
         ];
 
@@ -112,7 +118,19 @@ class PostRouteTest extends TestCase
         $endDate = '2021-10-31';
         $response = $this->json('GET', $this->apiPath . '?startdate=' . $startDate . '&enddate=' . $endDate);
 
-        $response->assertJsonCount(2);
+        $response->assertJsonCount(3);
+        $response->assertStatus(200);
+    }
+
+    public function testGetAllPosts_SpecificDateAndUserID_get1Post(): void
+    {
+        $startDate = '2021-01-01';
+        $endDate   = '2021-10-31';
+        $userID = 13;
+        $url       = $this->apiPath . '?startdate=' . $startDate . '&enddate=' . $endDate . '&uid=' . $userID;
+        $response  = $this->json('GET', $url);
+
+        $response->assertJsonCount(1);
         $response->assertStatus(200);
     }
 }
