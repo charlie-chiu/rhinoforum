@@ -16,6 +16,9 @@ class PostRouteTest extends TestCase
     private $apiPath = 'api/posts';
     private $postCount;
 
+    private $DUMMY_CONTENT = "lorem ipsum";
+    private $DUMMY_CATEGORY = "doesn't matter";
+
     public function setUp(): void
     {
         parent::setUp();
@@ -45,6 +48,18 @@ class PostRouteTest extends TestCase
                 'content'      => 'amazing case',
                 'category'     => 'review',
                 'published_at' => '2021-11-18'
+            ],
+            [
+                'user_id'      => 11,
+                'content'      => $this->DUMMY_CONTENT,
+                'category'     => $this->DUMMY_CATEGORY,
+                'published_at' => '2021-10-18'
+            ],
+            [
+                'user_id'      => 12,
+                'content'      => $this->DUMMY_CONTENT,
+                'category'     => $this->DUMMY_CATEGORY,
+                'published_at' => '2021-09-18'
             ]
         ];
 
@@ -89,5 +104,15 @@ class PostRouteTest extends TestCase
         $response->assertJsonCount(2);
         $response->assertStatus(200);
         $response->assertSeeText('hello');
+    }
+
+    public function testGetAllPosts_BetweenDate(): void
+    {
+        $startDate = '2021-01-01';
+        $endDate = '2021-10-31';
+        $response = $this->json('GET', $this->apiPath . '?startdate=' . $startDate . '&enddate=' . $endDate);
+
+        $response->assertJsonCount(2);
+        $response->assertStatus(200);
     }
 }

@@ -26,7 +26,16 @@ class PostController extends Controller
             $condition[] = ['content', 'like' , "%$search%"];
         }
 
-        $posts = Post::query()->where($condition)->get()->toArray();
+        $startDate = $request->get('startdate');
+        $endDate = $request->get('enddate');
+
+        $q = Post::query()->where($condition);
+
+        if (isset($startDate, $endDate)) {
+            $q = $q->whereBetween('published_at', [$startDate, $endDate]);
+        }
+
+        $posts = $q->get()->toArray();
 
         return response()->json($posts);
     }
