@@ -84,6 +84,14 @@ class PostRouteTest extends TestCase
         $response->assertJsonCount($this->postCount);
     }
 
+    public function testGetAllPosts_NoResult(): void
+    {
+        $response = $this->json('GET', $this->apiPath . '?uid=1023');
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(0);
+    }
+
     public function testGetAllPosts_SpecificAuthor(): void
     {
         $userID = 999;
