@@ -98,7 +98,10 @@ class PostRouteTest extends TestCase
         $response = $this->json('GET', $this->apiPath . '?uid=' . $userID);
 
         $response->assertStatus(200);
-        $response->assertSeeText('hello from 999');
+
+        foreach ($response->json() as $post) {
+            $this->assertEquals($userID, $post['user_id']);
+        }
     }
 
     public function testGetAllPosts_SpecificCategory(): void
@@ -107,7 +110,10 @@ class PostRouteTest extends TestCase
         $response = $this->json('GET', $this->apiPath . '?category=' . $category);
 
         $response->assertStatus(200);
-        $response->assertSeeText('amazing case');
+
+        foreach ($response->json() as $post) {
+            $this->assertEquals($category, $post['category']);
+        }
     }
 
     public function testGetAllPosts_ContainContent(): void
@@ -118,6 +124,10 @@ class PostRouteTest extends TestCase
         $response->assertJsonCount(2);
         $response->assertStatus(200);
         $response->assertSeeText('hello');
+
+        foreach ($response->json() as $post) {
+            $this->assertStringContainsString($keyword, $post['content']);
+        }
     }
 
     public function testGetAllPosts_BetweenDate(): void
@@ -140,18 +150,30 @@ class PostRouteTest extends TestCase
 
         $response->assertJsonCount(1);
         $response->assertStatus(200);
+
+        $post = $response->json()[0];
+        $this->assertEquals($post['user_id'], $userID);
     }
 
     public function testGetAllPosts_AllPosts_WithPagination(): void
     {
         $limit = 2;
         $response = $this->json('GET', $this->apiPath . '?limit=' . $limit);
-
         $response->assertStatus(200);
         $response->assertJsonCount(2);
+
+        $posts = $response->json();
+        foreach ($posts as $i => $post) {
+            $this->assertEquals($i+1, $post['id']);
+        }
 
         $response = $this->json('GET', $this->apiPath . '?limit=' . $limit . '&page=' . 3);
         $response->assertStatus(200);
         $response->assertJsonCount(2);
+        $posts = $response->json();
+        foreach ($posts as $i => $post) {
+            // 2 posts per page and start from page 3, mean id start from 5
+            $this->assertEquals($i+5, $post['id']);
+        }
     }
 }
