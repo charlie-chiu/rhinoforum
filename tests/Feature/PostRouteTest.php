@@ -141,4 +141,17 @@ class PostRouteTest extends TestCase
         $response->assertJsonCount(1);
         $response->assertStatus(200);
     }
+
+    public function testGetAllPosts_AllPosts_WithPagination(): void
+    {
+        $limit = 2;
+        $response = $this->json('GET', $this->apiPath . '?limit=' . $limit);
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(2);
+
+        $response = $this->json('GET', $this->apiPath . '?limit=' . $limit . '&page=' . 3);
+        $response->assertStatus(200);
+        $response->assertJsonCount(2);
+    }
 }

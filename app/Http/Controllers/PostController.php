@@ -22,6 +22,8 @@ class PostController extends Controller
             $request->get('search'),
             $request->get('startdate'),
             $request->get('enddate'),
+            $request->get('limit'),
+            $request->get('page'),
         );
 
         return response()->json($posts);
